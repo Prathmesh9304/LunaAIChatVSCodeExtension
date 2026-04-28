@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  /* Main UI Colors */
+  --color-background: var(--vscode-editor-background);
+  --color-foreground: var(--vscode-editor-foreground);
+  
+  /* Primary Action Colors (Buttons) */
+  --color-primary: var(--vscode-button-background);
+  --color-primary-hover: var(--vscode-button-hoverBackground);
+  --color-primary-fg: var(--vscode-button-foreground);
+
+  /* Secondary/Input UI */
+  --color-input-bg: var(--vscode-input-background);
+  --color-input-fg: var(--vscode-input-foreground);
+  --color-input-border: var(--vscode-input-border);
+  
+  /* Layout & Borders */
+  --color-panel-border: var(--vscode-panel-border);
+  --color-side-bar-bg: var(--vscode-sideBar-background);
+  
+  /* Feedback Colors */
+  --color-error: var(--vscode-errorForeground);
+  --color-success: var(--vscode-testing-iconPassed);
+  --color-warning: var(--vscode-warningForeground);
+}
