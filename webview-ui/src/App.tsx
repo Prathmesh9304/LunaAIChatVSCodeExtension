@@ -1,107 +1,81 @@
 import { useState, useEffect } from "react";
-import { Send } from "lucide-react";
+import { MessageSquarePlus, History as HistoryIcon, Settings, Sparkles } from "lucide-react";
 import { vscode } from "./utilities/vscode";
 import "./index.css";
+import { Home } from "./pages/Home";
+import { History } from "./pages/History";
+import { Setting } from "./pages/Setting";
 
-interface Message {
-  id: number;
-  text: string;
-  sender: "user" | "bot";
-}
+type Page = "home" | "history" | "setting";
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState("");
+  const [currentPage, setCurrentPage] = useState<Page>("home");
 
   // Restore state on mount
   useEffect(() => {
-    const state = vscode.getState() as { messages?: Message[] };
-    if (state?.messages) {
-      setMessages(state.messages);
+    const state = vscode.getState() as { currentPage?: Page };
+    if (state?.currentPage) {
+      setCurrentPage(state.currentPage);
     }
   }, []);
 
-  // Save state when messages change
+  // Save state when page changes
   useEffect(() => {
-    vscode.setState({ messages });
-  }, [messages]);
-
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-
-    // Add user message
-    const newMessage: Message = {
-      id: Date.now(),
-      text: inputValue.trim(),
-      sender: "user",
-    };
-
-    setMessages((prev) => [...prev, newMessage]);
-    setInputValue("");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSend();
-    }
-  };
+    const currentState = vscode.getState() as any || {};
+    vscode.setState({ ...currentState, currentPage });
+  }, [currentPage]);
 
   return (
-    <main className="flex flex-col h-screen w-full bg-background text-foreground">
-      {/* Header */}
-      <header className="p-3 border-b border-panel-border shadow-sm font-semibold">
-        Luna Chat
-      </header>
-
-      {/* Messages List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 focus:outline-none">
-        {messages.length === 0 ? (
-          <div className="text-center text-gray-500 mt-10">
-            Ask me anything...
-          </div>
-        ) : (
-          messages.map((msg) => (
-            <div
-              key={msg.id}
-              className={
-                "flex w-full " +
-                (msg.sender === "user" ? "justify-end" : "justify-start")
-              }
-            >
-              <div
-                className={
-                  "max-w-[85%] px-4 py-2 rounded-lg " +
-                  (msg.sender === "user"
-                    ? "bg-primary text-primary-fg"
-                    : "bg-input-bg border border-panel-border")
-                }
-              >
-                {msg.text}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      {/* Input Area */}
-      <div className="p-4 border-t border-panel-border bg-side-bar-bg">
-        <div className="flex items-center gap-2 bg-input-bg border border-input-border rounded-md p-1 focus-within:ring-1 focus-within:ring-primary">
-          <input
-            type="text"
-            className="flex-1 w-full bg-transparent border-none outline-none text-input-fg px-3 py-2 text-sm placeholder:text-gray-500"
-            placeholder="Type a message..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
+    <main className="flex flex-col h-screen w-full bg-background text-foreground overflow-hidden">
+      
+      {/* Subtle, Bordered Header / Navbar */}
+      <header className="w-full shrink-0 bg-transparent border-b border-panel-border flex items-center justify-between p-3">
+        <div className="font-bold flex items-center gap-2 text-primary">
+          <Sparkles size={18} className="text-blue-500" />
+          <span className="tracking-wide">Luna Chat</span>
+        </div>
+        <div className="flex space-x-2">
           <button
-            onClick={handleSend}
-            disabled={!inputValue.trim()}
-            className="flex items-center justify-center p-2 rounded-md hover:bg-background text-primary disabled:opacity-50 transition-colors cursor-pointer"
+            onClick={() => setCurrentPage("home")}
+            title="New Chat"
+            className={`p-2 rounded-md transition-colors ${
+              currentPage === "home" 
+                ? "bg-input-bg text-primary shadow-sm border border-panel-border" 
+                : "text-gray-500 hover:text-foreground hover:bg-input-bg"
+            }`}
           >
-            <Send size={18} />
+            <MessageSquarePlus size={18} />
+          </button>
+          <button
+            onClick={() => setCurrentPage("history")}
+            title="History"
+            className={`p-2 rounded-md transition-colors ${
+              currentPage === "history" 
+                ? "bg-input-bg text-primary shadow-sm border border-panel-border" 
+                : "text-gray-500 hover:text-foreground hover:bg-input-bg"
+            }`}
+          >
+            <HistoryIcon size={18} />
+          </button>
+          <button
+            onClick={() => setCurrentPage("setting")}
+            title="Settings"
+            className={`p-2 rounded-md transition-colors ${
+              currentPage === "setting" 
+                ? "bg-input-bg text-primary shadow-sm border border-panel-border" 
+                : "text-gray-500 hover:text-foreground hover:bg-input-bg"
+            }`}
+          >
+            <Settings size={18} />
           </button>
         </div>
+      </header>
+
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-hidden relative">
+        {currentPage === "home" && <Home />}
+        {currentPage === "history" && <History />}
+        {currentPage === "setting" && <Setting />}
       </div>
     </main>
   );
