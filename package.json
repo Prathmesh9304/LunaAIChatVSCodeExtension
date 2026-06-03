@@ -68,6 +68,7 @@
     "typescript-eslint": "^8.56.1"
   },
   "dependencies": {
-    "@vscode/vsce": "^3.9.1"
+    "@vscode/vsce": "^3.9.1",
+    "lucide-react": "^1.16.0"
   }
 }

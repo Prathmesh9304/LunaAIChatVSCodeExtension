@@ -1,10 +1,36 @@
-import { commands, ExtensionContext, window } from "vscode";
+// import { commands, ExtensionContext, window } from "vscode";
+// import { SidebarProvider } from "./providers/SidebarProvider";
+
+// export function activate(context: ExtensionContext) {
+//   const sidebarProvider = new SidebarProvider(context.extensionUri);
+
+//   context.subscriptions.push(
+//     window.registerWebviewViewProvider("luna.sidebar", sidebarProvider),
+//   );
+// }
+
+import * as vscode from "vscode";
 import { SidebarProvider } from "./providers/SidebarProvider";
 
-export function activate(context: ExtensionContext) {
-  const sidebarProvider = new SidebarProvider(context.extensionUri);
+export function activate(
+  context: vscode.ExtensionContext
+) {
+
+  const sidebarProvider =
+    new SidebarProvider(
+      context.extensionUri,
+      context
+    );
 
   context.subscriptions.push(
-    window.registerWebviewViewProvider("luna.sidebar", sidebarProvider),
+
+    vscode.window.registerWebviewViewProvider(
+      "luna.sidebar",
+      sidebarProvider
+    )
+
   );
+
 }
+
+export function deactivate() {}
