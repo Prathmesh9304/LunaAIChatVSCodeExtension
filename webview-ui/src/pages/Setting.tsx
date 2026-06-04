@@ -1,4 +1,5 @@
-import { Settings2, Palette, Key, Save } from "lucide-react";
+import { Settings2, Key, Save } from "lucide-react";
+import { ProviderSelect } from "../components/ProviderSelect";
 
 export function Setting() {
   return (
@@ -10,20 +11,9 @@ export function Setting() {
       
       <div className="glass-panel p-5 rounded-2xl space-y-5 shadow-sm border border-white/5">
         
-        {/* Theme Setting */}
-        <div className="flex flex-col space-y-2 group">
-          <label className="text-sm font-medium text-foreground flex items-center gap-2 opacity-80">
-            <Palette size={16} className="text-gray-400 group-hover:text-blue-400 transition-colors" />
-            Theme Preference
-          </label>
-          <select className="bg-background/50 border border-panel-border text-foreground rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer hover:bg-background/80">
-            <option value="system">System Default</option>
-            <option value="dark">Dark Mode</option>
-            <option value="light">Light Mode</option>
-          </select>
-        </div>
+        <ProviderSelect />
 
-        <div className="h-px w-full bg-panel-border/50"></div>
+
 
         {/* API Key Setting */}
         <div className="flex flex-col space-y-2 group">

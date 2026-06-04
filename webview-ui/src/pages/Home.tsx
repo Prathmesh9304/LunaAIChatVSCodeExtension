@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Trash2 } from "lucide-react";
+import { Send, Bot, User, Trash2, ChevronDown, Check } from "lucide-react";
 import { vscode } from "../utilities/vscode";
+import { provider } from "../utilities/util";
 
 interface Message {
   id: number;
@@ -12,6 +13,32 @@ export function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
+
+  // Dropdown states
+  const [isLocal, setIsLocal] = useState("Local");
+  const [isLocalDropdownOpen, setIsLocalDropdownOpen] = useState(false);
+  
+  const [selectedModel, setSelectedModel] = useState("Select Model");
+  const [isModelDropdownOpen, setIsModelDropdownOpen] = useState(false);
+
+  const localDropdownRef = useRef<HTMLDivElement>(null);
+  const modelDropdownRef = useRef<HTMLDivElement>(null);
+
+  const uniqueModels = Array.from(new Set(provider.flatMap(p => p.model)));
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (localDropdownRef.current && !localDropdownRef.current.contains(event.target as Node)) {
+        setIsLocalDropdownOpen(false);
+      }
+      if (modelDropdownRef.current && !modelDropdownRef.current.contains(event.target as Node)) {
+        setIsModelDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Restore state on mount
   useEffect(() => {
@@ -119,36 +146,103 @@ export function Home() {
       </div>
 
       {/* Input Area (Floating) */}
-      <div className="absolute bottom-4 left-4 right-4 z-20 flex gap-2 items-center">
-        {messages.length > 0 && (
-          <button 
-            onClick={handleClearChat}
-            className="p-3 rounded-xl bg-input-bg border border-panel-border text-gray-500 hover:text-red-400 hover:border-red-400/50 transition-colors shadow-sm cursor-pointer"
-            title="Clear Chat"
-          >
-            <Trash2 size={18} />
-          </button>
-        )}
-        <div className="flex-1 flex items-center gap-2 bg-input-bg border border-panel-border rounded-2xl p-2 shadow-lg transition-all focus-within:ring-2 focus-within:ring-blue-500/50">
-          <input
-            type="text"
-            className="flex-1 w-full bg-transparent border-none outline-none text-foreground px-3 py-2 text-sm placeholder:text-gray-500"
-            placeholder="Type a message..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-          <button
-            onClick={handleSend}
-            disabled={!inputValue.trim()}
-            className={`flex items-center justify-center p-2 rounded-xl transition-all duration-300 ${
-              inputValue.trim()
-                ? "bg-blue-600 text-white shadow-md hover:bg-blue-500 cursor-pointer"
-                : "bg-transparent text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            <Send size={18} className={inputValue.trim() ? "translate-x-0.5 -translate-y-0.5" : ""} />
-          </button>
+      <div className="absolute bottom-4 left-4 right-4 z-20 flex flex-col gap-2">
+        <div className="flex gap-2 items-center w-full">
+          {messages.length > 0 && (
+            <button 
+              onClick={handleClearChat}
+              className="p-3 rounded-xl bg-input-bg border border-panel-border text-gray-500 hover:text-red-400 hover:border-red-400/50 transition-colors shadow-sm cursor-pointer"
+              title="Clear Chat"
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
+          <div className="flex-1 flex items-center gap-2 bg-input-bg border border-panel-border rounded-2xl p-2 shadow-lg transition-all focus-within:ring-2 focus-within:ring-blue-500/50">
+            <input
+              type="text"
+              className="flex-1 w-full bg-transparent border-none outline-none text-foreground px-3 py-2 text-sm placeholder:text-gray-500"
+              placeholder="Type a message..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            <button
+              onClick={handleSend}
+              disabled={!inputValue.trim()}
+              className={`flex items-center justify-center p-2 rounded-xl transition-all duration-300 ${
+                inputValue.trim()
+                  ? "bg-blue-600 text-white shadow-md hover:bg-blue-500 cursor-pointer"
+                  : "bg-transparent text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              <Send size={18} className={inputValue.trim() ? "translate-x-0.5 -translate-y-0.5" : ""} />
+            </button>
+          </div>
+        </div>
+        
+        {/* Local & Model Selection Dropdowns */}
+        <div className="flex items-center gap-1 px-1">
+          {/* Local / Cloud Dropdown */}
+          <div className="relative" ref={localDropdownRef}>
+            <button 
+              onClick={() => setIsLocalDropdownOpen(!isLocalDropdownOpen)}
+              className="flex items-center gap-1 text-[11px] font-medium text-gray-400 hover:text-foreground hover:bg-input-bg/80 px-2 py-1 rounded-md transition-colors cursor-pointer outline-none"
+            >
+              {isLocal} <ChevronDown size={12} className={`opacity-70 transition-transform ${isLocalDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isLocalDropdownOpen && (
+              <div className="absolute bottom-full mb-1 left-0 w-28 bg-input-bg border border-panel-border rounded-lg shadow-xl z-50 p-1 flex flex-col animate-fade-in-up">
+                {["Local", "Cloud"].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setIsLocal(type);
+                      setIsLocalDropdownOpen(false);
+                    }}
+                    className={`flex items-center justify-between px-2 py-1.5 text-[11px] rounded-md transition-colors ${
+                      isLocal === type ? "bg-blue-500/10 text-foreground" : "text-gray-400 hover:bg-background/50 hover:text-foreground"
+                    }`}
+                  >
+                    {type}
+                    {isLocal === type && <Check size={12} className="text-blue-500" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Model Dropdown */}
+          <div className="relative" ref={modelDropdownRef}>
+            <button 
+              onClick={() => setIsModelDropdownOpen(!isModelDropdownOpen)}
+              className="flex items-center gap-1 text-[11px] font-medium text-gray-400 hover:text-foreground hover:bg-input-bg/80 px-2 py-1 rounded-md transition-colors cursor-pointer outline-none max-w-[200px]"
+            >
+              <span className="truncate">{selectedModel}</span>
+              <ChevronDown size={12} className={`opacity-70 flex-shrink-0 transition-transform ${isModelDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isModelDropdownOpen && (
+              <div className="absolute bottom-full mb-1 left-0 w-48 bg-input-bg border border-panel-border rounded-lg shadow-xl z-50 p-1 flex flex-col max-h-[250px] overflow-y-auto animate-fade-in-up">
+                <div className="px-2 py-1 text-[10px] font-semibold text-gray-500 tracking-wider sticky top-0 bg-input-bg/90 backdrop-blur-sm z-10">
+                  AVAILABLE MODELS
+                </div>
+                {uniqueModels.map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => {
+                      setSelectedModel(m);
+                      setIsModelDropdownOpen(false);
+                    }}
+                    className={`flex items-center justify-between px-2 py-1.5 text-[11px] rounded-md transition-colors ${
+                      selectedModel === m ? "bg-blue-500/10 text-foreground" : "text-gray-400 hover:bg-background/50 hover:text-foreground"
+                    }`}
+                  >
+                    <span className="truncate text-left">{m}</span>
+                    {selectedModel === m && <Check size={12} className="text-blue-500 flex-shrink-0" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
