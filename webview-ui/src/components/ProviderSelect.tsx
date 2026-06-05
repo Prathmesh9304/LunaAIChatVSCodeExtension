@@ -1,11 +1,54 @@
 import { useState, useRef, useEffect } from "react";
 import { Search, ChevronDown, Check } from "lucide-react";
-import { provider } from "../utilities/util";
 
-export function ProviderSelect() {
+export interface ProviderItem {
+  logo: string;
+  name: string;
+  model: string[];
+}
+
+interface ProviderSelectProps {
+  providers: ProviderItem[];
+  selectedProvider: ProviderItem;
+  selectedModel: string;
+  onProviderChange: (provider: ProviderItem) => void;
+  onModelChange: (model: string) => void;
+}
+
+const renderLogo = (providerName: string, logoUrl: string, sizeClass = "w-5 h-5") => {
+  const isColored = providerName === "Google Gemini" || providerName === "Mistral";
+  
+  if (isColored) {
+    return (
+      <img src={logoUrl} className={`${sizeClass} object-contain`} alt={providerName} />
+    );
+  } else {
+    return (
+      <div 
+        className={`${sizeClass} bg-foreground`} 
+        style={{
+          maskImage: `url("${logoUrl}")`,
+          WebkitMaskImage: `url("${logoUrl}")`,
+          maskSize: 'contain',
+          WebkitMaskSize: 'contain',
+          maskRepeat: 'no-repeat',
+          WebkitMaskRepeat: 'no-repeat',
+          maskPosition: 'center',
+          WebkitMaskPosition: 'center',
+        }}
+      />
+    );
+  }
+};
+
+export function ProviderSelect({
+  providers,
+  selectedProvider,
+  selectedModel,
+  onProviderChange,
+  onModelChange,
+}: ProviderSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState(provider[0]);
-  const [selectedModel, setSelectedModel] = useState(provider[0].model[0]);
   const [search, setSearch] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -19,7 +62,7 @@ export function ProviderSelect() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredProviders = provider.filter((p) =>
+  const filteredProviders = providers.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -31,15 +74,13 @@ export function ProviderSelect() {
         
         <div className="relative">
           <button
+            type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="w-full flex items-center justify-between bg-input-bg border border-panel-border hover:bg-background/80 text-foreground rounded-xl p-3 outline-none transition-all"
+            className="w-full flex items-center justify-between bg-input-bg border border-panel-border hover:bg-background/80 text-foreground rounded-xl p-3 outline-none transition-all cursor-pointer"
           >
             <div className="flex items-center gap-3">
-              {/* Placeholder for logo */}
-              <div className="w-5 h-5 bg-foreground/20 rounded flex items-center justify-center text-[10px] font-bold">
-                {selected.name.charAt(0)}
-              </div>
-              <span className="font-medium">{selected.name}</span>
+              {renderLogo(selectedProvider.name, selectedProvider.logo)}
+              <span className="font-medium">{selectedProvider.name}</span>
             </div>
             <ChevronDown size={16} className={`text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </button>
@@ -67,23 +108,21 @@ export function ProviderSelect() {
                   {filteredProviders.map((p) => (
                     <button
                       key={p.name}
+                      type="button"
                       onClick={() => {
-                        setSelected(p);
-                        setSelectedModel(p.model[0]);
+                        onProviderChange(p);
                         setIsOpen(false);
                         setSearch("");
                       }}
-                      className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors ${
-                        selected.name === p.name ? "bg-blue-500/10 text-foreground" : "hover:bg-background/50 text-foreground/80 hover:text-foreground"
+                      className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors cursor-pointer ${
+                        selectedProvider.name === p.name ? "bg-blue-500/10 text-foreground" : "hover:bg-background/50 text-foreground/80 hover:text-foreground"
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-5 h-5 bg-foreground/10 rounded flex items-center justify-center text-[10px] font-bold">
-                          {p.name.charAt(0)}
-                        </div>
+                        {renderLogo(p.name, p.logo)}
                         <span className="text-sm font-medium">{p.name}</span>
                       </div>
-                      {selected.name === p.name && <Check size={16} className="text-blue-500" />}
+                      {selectedProvider.name === p.name && <Check size={16} className="text-blue-500" />}
                     </button>
                   ))}
                   {filteredProviders.length === 0 && (
@@ -106,11 +145,11 @@ export function ProviderSelect() {
           Model
         </label>
         <select 
-          className="bg-background/50 border border-panel-border text-foreground rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer hover:bg-background/80"
+          className="w-full bg-background/50 border border-panel-border text-foreground rounded-xl p-3 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer hover:bg-background/80"
           value={selectedModel}
-          onChange={(e) => setSelectedModel(e.target.value)}
+          onChange={(e) => onModelChange(e.target.value)}
         >
-          {selected.model.map(m => (
+          {selectedProvider.model.map(m => (
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
@@ -118,3 +157,4 @@ export function ProviderSelect() {
     </div>
   );
 }
+
