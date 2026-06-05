@@ -3,7 +3,7 @@
   "displayName": "Luna: AI Chat",
   "description": "A code analyzing and refactoring tool",
   "publisher": "prathmesh9304",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "icon": "media/icon.jpg",
   "engines": {
     "vscode": "^1.116.0"
@@ -47,6 +47,7 @@
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "watch:webview": "cd webview-ui && npx vite build --watch",
     "package": "npm run check-types && npm run lint && node esbuild.js --production",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
