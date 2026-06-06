@@ -1,1 +1,39 @@
-[]
+[
+  {
+    "id": "1780660644577",
+    "title": "Is this code good",
+    "timestamp": 1780661277848,
+    "messages": [
+      {
+        "id": 1780660644577,
+        "text": "Is this code good",
+        "sender": "user"
+      },
+      {
+        "id": 1780660647040,
+        "text": "## 🟢 Code Quality: Good\n\n### 📝 Source Code\ntypescriptreact\nimport { useState, useEffect, useRef } from \"react\";\nimport { Send, Bot, User, ChevronDown, Check, Settings, Copy } from \"lucide-react\";\nimport { vscode } from \"../utilities/vscode\";\nimport lunaLogo from \"../../public/assets/luna.svg\";\n\n// ...\n\nexport function Home({ messages, setMessages, currentSessionId, setCurrentSessionId }: HomeProps) {\n  // ...\n}\n\n\n### ⚠️ Issues & Smells\n\n* The `Home` component has a significant amount of code within a single function. This makes it harder to maintain and understand.\n* The component has multiple, tightly coupled state variables (currentSessionId, selectedProviderName, selectedModelName, etc.).\n* There are multiple event handlers for different events (e.g., handleSend, handleKeyDown, etc.), making it harder to manage.\n\n### 🛠️ Refactoring\n\nHere's a refactored version of the Home component with improved structure and separation of concerns:\n\ntypescriptreact\nimport { useState, useEffect, useRef } from \"react\";\nimport { Send, Bot, User, ChevronDown, Check, Settings, Copy } from \"lucide-react\";\nimport { vscode } from \"../utilities/vscode\";\nimport lunaLogo from \"../../public/assets/luna.svg\";\n\ninterface HomeProps {\n  // ...\n}\n\nconst MESSAGE_REGEX = /\\s*(.*?)/s;\n\ninterface MessagePart {\n  isCodeBlock: boolean;\n  language: string;\n  code: string;\n}\n\ninterface ConfigItem {\n  provider: string;\n  model: string;\n  apiKey: string;\n}\n\ninterface ProviderModelItem {\n  provider: string;\n  model: string;\n}\n\ninterface HomeState {\n  inputValue: string;\n  isLoading: boolean;\n  selectedProvider: string;\n  selectedModel: string;\n  config: ConfigItem[];\n  messages: Message[];\n}\n\nclass Home extends React.Component<HomeProps, HomeState> {\n  private endOfMessagesRef = useRef<HTMLDivElement>(null);\n\n  constructor(props: HomeProps) {\n    super(props);\n    this.state = {\n      inputValue: \"\",\n      isLoading: false,\n      selectedProvider: \"\",\n      selectedModel: \"\",\n      config: [],\n      messages: [],\n    };\n  }\n\n  componentDidMount() {\n    // ...\n  }\n\n  componentWillUnmount() {\n    // ...\n  }\n\n  private handleSend = () => {\n    // ...\n  };\n\n  private handleKeyDown = () => {\n    // ...\n  };\n\n  private parseMessageContent(text: string): React.ReactNode[] {\n    // ...\n  };\n\n  private getUniqueConfiguredProviders(config: ConfigItem[]): string[] {\n    // ...\n  };\n\n  render() {\n    const { inputValue, isLoading, selectedProvider, selectedModel, config, messages } = this.state;\n\n    return (\n      <div>\n        {/* Messages List */}\n        <ul>\n          {config.length === 0 ? (\n            <li>No providers configured</li>\n          ) : (\n            messages.map((message) => (\n              <li key={message.id}>\n                <div className=\"message-container\">\n                  {message.sender === \"user\" ? (\n                    <div className=\"message\">\n                      {this.parseMessageContent(message.text)}\n                    </div>\n                  ) : (\n                    <div className=\"message\">\n                      {this.parseMessageContent(message.text)}\n                    </div>\n                  )}\n                </div>\n              </li>\n            ))\n          )}\n        </ul>\n\n        {/* Input Area */}\n        <input\n          type=\"text\"\n          value={inputValue}\n          onChange={(e) => this.setState({ inputValue: e.target.value })}\n          onKeyDown={this.handleKeyDown}\n          disabled={isLoading || config.length === 0}\n        />\n        <button onClick={this.handleSend} disabled={!inputValue.trim() || isLoading || config.length === 0}>\n          Send\n        </button>\n\n        {/* Selection Dropdowns */}\n        {config.length > 0 && (\n          <div>\n            <button>\n              <span>{selectedProvider}</span>\n              <ChevronDown />\n            </button>\n            {providers.map((provider) => (\n              <button key={provider} onClick={() => this.setState({ selectedProvider: provider })}>\n                {provider}\n              </button>\n            ))}\n          </div>\n        )}\n      </div>\n    );\n  }\n}\n\n\nNote that this refactored version has a clearer structure and separation of concerns. However, please review and adjust the code to fit your specific needs and requirements.\n\n### 💡 Best Practices\n\n* Divide complex components into smaller, more manageable pieces.\n* Use functional components with hooks for easier state management and less boilerplate code.\n* Avoid tightly coupled state variables by using a single state object or class.\n* Use Markdown syntax for code blocks to provide better formatting and readability.\n* Review and adjust the code to fit your specific needs and requirements.",
+        "sender": "bot"
+      },
+      {
+        "id": 1780660898109,
+        "text": "Hii",
+        "sender": "user"
+      },
+      {
+        "id": 1780660898619,
+        "text": "Hi! 😊 How can I assist you today? Are you working on a project and need some help with code refactoring or analysis?",
+        "sender": "bot"
+      },
+      {
+        "id": 1780660925662,
+        "text": "Yes",
+        "sender": "user"
+      },
+      {
+        "id": 1780660926175,
+        "text": "It seems you've provided an answer, but I need a bit more context or input to analyze it. Could you provide more details or clarify what you're referring to?",
+        "sender": "bot"
+      }
+    ]
+  }
+]
