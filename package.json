@@ -3,7 +3,7 @@
   "displayName": "Luna: AI Chat",
   "description": "A code analyzing and refactoring tool",
   "publisher": "prathmesh9304",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icon": "media/icon.jpg",
   "engines": {
     "vscode": "^1.116.0"
